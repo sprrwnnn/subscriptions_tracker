@@ -1,0 +1,10 @@
+.env
+.gocache/
+tmp/
+bin/
+
+*.log
+
+.DS_Store
+.idea/
+.vscode/settings.json

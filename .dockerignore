@@ -1,0 +1,11 @@
+.git
+.gocache
+.env
+.DS_Store
+.idea
+.vscode
+bin
+tmp
+
+README.md
+Makefile
