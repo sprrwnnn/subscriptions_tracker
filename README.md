@@ -1,26 +1,26 @@
 # Subscription Tracker
 
-REST-service for aggregating user online subscriptions.
+REST-сервис для агрегации пользовательских онлайн-подписок
 
-## Features
+## Возможности
 
-- CRUD operations for subscriptions.
-- Total subscription cost calculation for a selected period.
-- Optional filtering by user ID and service name.
-- PostgreSQL storage with SQL migrations.
-- Structured JSON logging.
+- CRUD-операции с подписками
+- Расчёт общей стоимости подписок за выбранный период
+- Опциональная фильтрация по ID пользователя и названию сервиса
+- Хранение в PostgreSQL с SQL-миграциями
+- Структурированное JSON-логирование
 - Swagger UI.
-- Docker Compose startup.
+- Запуск через Docker Compose
 
-## Configuration
+## Конфигурация
 
-Copy `.env.example` to `.env` for local runs:
+Скопируйте .env.example в .env для локального запуска:
 
 ```bash
 cp .env.example .env
 ```
 
-Available variables:
+Доступные переменные:
 
 ```env
 DB_HOST=localhost
@@ -34,19 +34,19 @@ HOST_PORT=8080
 LOG_LEVEL=info
 ```
 
-## Run With Docker Compose
+## Запуск с Docker Compose
 
 ```bash
 docker compose up --build
 ```
 
-If port `8080` is already busy, choose another host port:
+Если порт 8080 уже занят, выберите другой порт на хосте:
 
 ```bash
 HOST_PORT=18080 docker compose up --build
 ```
 
-The API will be available at:
+API будет доступно по адресу:
 
 ```text
 http://localhost:8080/api/v1
@@ -58,9 +58,9 @@ Swagger UI:
 http://localhost:8080/swagger/index.html
 ```
 
-## API Examples
+## Примеры API
 
-Create a subscription:
+Создание подписки:
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/subscriptions \
@@ -73,13 +73,13 @@ curl -X POST http://localhost:8080/api/v1/subscriptions \
   }'
 ```
 
-List subscriptions:
+Список подписок:
 
 ```bash
 curl "http://localhost:8080/api/v1/subscriptions?page=1&page_size=20"
 ```
 
-Calculate total cost:
+Расчет общей стоимости:
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/calculate-cost \
@@ -92,7 +92,7 @@ curl -X POST http://localhost:8080/api/v1/calculate-cost \
   }'
 ```
 
-## Local Development
+## Локальная разработка
 
 ```bash
 go mod tidy
