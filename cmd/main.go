@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -44,6 +45,10 @@ func main() {
 	if err != nil {
 		logrus.Fatal("Failed to connect to database:", err)
 	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		logrus.Fatal("Failed to get database handle:", err)
+	}
 
 	// Setup dependencies
 	subRepo := repository.NewSubscriptionRepository(db, logrus.StandardLogger())
@@ -53,6 +58,25 @@ func main() {
 	// Setup router
 	router := gin.Default()
 	router.Use(middleware.LoggingMiddleware(logrus.StandardLogger()))
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+		})
+	})
+	router.GET("/ready", func(c *gin.Context) {
+		if err := sqlDB.PingContext(c.Request.Context()); err != nil {
+			logrus.WithError(err).Error("Readiness check failed")
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status": "error",
+				"error":  "database is not ready",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ready",
+		})
+	})
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := router.Group("/api/v1")

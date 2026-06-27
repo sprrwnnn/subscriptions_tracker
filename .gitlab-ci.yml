@@ -1,0 +1,54 @@
+stages:
+  - test
+  - build
+  - package
+
+variables:
+  GO_VERSION: "1.26"
+  DOCKER_TLS_CERTDIR: "/certs"
+  GOPATH: "$CI_PROJECT_DIR/.go"
+  GOMODCACHE: "$CI_PROJECT_DIR/.go/pkg/mod"
+
+go-check:
+  stage: test
+  image: golang:${GO_VERSION}-alpine
+  before_script:
+    - apk add --no-cache git
+  script:
+    - go mod download
+    - ./scripts/check.sh
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .go/pkg/mod/
+
+go-build:
+  stage: build
+  image: golang:${GO_VERSION}-alpine
+  before_script:
+    - apk add --no-cache git
+  script:
+    - go build -o bin/subscription-tracker ./cmd
+  artifacts:
+    paths:
+      - bin/subscription-tracker
+    expire_in: 1 week
+
+docker-image:
+  stage: package
+  image: docker:27
+  services:
+    - docker:27-dind
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+        docker tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" "$CI_REGISTRY_IMAGE:latest"
+        docker push "$CI_REGISTRY_IMAGE:latest"
+      fi

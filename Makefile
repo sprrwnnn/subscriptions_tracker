@@ -1,6 +1,7 @@
 APP_NAME=subscription-tracker
+HOST_PORT ?= 8080
 
-.PHONY: run build test tidy docker-build docker-up docker-down migrate-up migrate-down swagger clean
+.PHONY: run build fmt vet test tidy check docker-build docker-up docker-down docker-logs docker-ps migrate-up migrate-down swagger health ready clean
 
 run:
 	go run ./cmd
@@ -8,11 +9,20 @@ run:
 build:
 	go build -o bin/$(APP_NAME) ./cmd
 
+fmt:
+	find . -name '*.go' -not -path './.git/*' -not -path './.gocache/*' -not -path './subscriptions_tracker/*' -exec gofmt -w {} +
+
+vet:
+	go vet ./...
+
 test:
 	go test ./...
 
 tidy:
 	go mod tidy
+
+check:
+	./scripts/check.sh
 
 docker-build:
 	docker compose build
@@ -23,14 +33,26 @@ docker-up:
 docker-down:
 	docker compose down
 
+docker-logs:
+	docker compose logs -f app
+
+docker-ps:
+	docker compose ps
+
 migrate-up:
-	migrate -path migrations -database "postgres://postgres:postgres@localhost:5432/subscriptions?sslmode=disable" up
+	./scripts/run-migrations.sh up
 
 migrate-down:
-	migrate -path migrations -database "postgres://postgres:postgres@localhost:5432/subscriptions?sslmode=disable" down
+	./scripts/run-migrations.sh down
 
 swagger:
 	swag init -g cmd/main.go
+
+health:
+	curl -fsS http://localhost:$(HOST_PORT)/health
+
+ready:
+	curl -fsS http://localhost:$(HOST_PORT)/ready
 
 clean:
 	rm -rf bin/

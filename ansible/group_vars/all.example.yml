@@ -1,0 +1,14 @@
+app_name: subscription-tracker
+app_dir: /opt/subscription-tracker
+compose_file: docker-compose.yml
+
+db_host: postgres
+db_port: "5432"
+db_user: postgres
+db_password: postgres
+db_name: subscriptions
+db_sslmode: disable
+
+server_port: "8080"
+host_port: "8080"
+log_level: info

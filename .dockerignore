@@ -1,11 +1,13 @@
 .git
 .gocache
 .env
+.env.*
+!.env.example
 .DS_Store
 .idea
 .vscode
 bin
 tmp
-
-README.md
-Makefile
+coverage.out
+*.log
+subscriptions_tracker

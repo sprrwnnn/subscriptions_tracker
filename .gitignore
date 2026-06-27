@@ -1,10 +1,13 @@
 .env
+.go/
 .gocache/
 tmp/
 bin/
+coverage.out
 
 *.log
 
 .DS_Store
 .idea/
 .vscode/settings.json
+ansible/inventory.ini
